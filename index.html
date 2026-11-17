@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chirp — Social Feed</title>
+<style>
+:root{--yellow:#ffd400;--yellow2:#fff0a6;--ink:#242424;--muted:#777;--paper:#fffdf1;--line:#eee8cf;--white:#fff;--shadow:0 8px 28px rgba(80,65,0,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 Inter,Arial,sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer;border:0}a{color:inherit;text-decoration:none}
+.hidden{display:none!important}.app{min-height:100vh}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(5vw,20px);position:sticky;top:0;z-index:5}
+.brand{font-size:22px;font-weight:900;letter-spacing:-1px;display:flex;align-items:center;gap:9px}.brandmark{width:28px;height:28px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;font-size:17px}
+.nav{display:flex;gap:9px;align-items:center}.nav button,.pill{background:var(--yellow);padding:9px 15px;border-radius:22px;font-weight:750;font-size:13px}.nav button.active,.nav button:hover,.pill:hover{background:#e9bd00}.nav .dark{background:#292929;color:white}
+.layout{max-width:1040px;margin:28px auto;padding:0 18px;display:grid;grid-template-columns:220px minmax(0,620px) 180px;gap:22px}
+.side-card,.panel,.post,.profile-card{background:white;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+.side-card{padding:18px;height:max-content;position:sticky;top:84px}.user-mini{display:flex;align-items:center;gap:10px;margin-bottom:18px}.avatar{width:40px;height:40px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;font-weight:900;color:#333;flex-shrink:0}.avatar.small{width:34px;height:34px;font-size:13px}.muted{color:var(--muted);font-size:12px}.side-link{display:flex;gap:12px;padding:11px 9px;border-radius:10px;font-weight:700;color:#555;cursor:pointer}.side-link:hover,.side-link.active{background:#fff7ce;color:#292929}
+.content{min-width:0}.welcome{background:linear-gradient(110deg,#fff1a8,#ffda00);border-radius:15px;padding:19px 22px;margin-bottom:17px}.welcome h2{margin:0 0 3px;font-size:21px}.welcome p{margin:0;font-size:12px;color:#5c5100}
+.composer{padding:16px;margin-bottom:18px}.composer h3,.section-title{font-size:15px;margin:0 0 12px}.composer textarea{width:100%;border:1px solid var(--line);border-radius:12px;resize:vertical;min-height:82px;padding:12px;outline:none;background:#fffefa}.composer textarea:focus,.field:focus{border-color:#e3bf00;box-shadow:0 0 0 3px #fff4bd}
+.composer-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:10px}.composer-tools{display:flex;align-items:center;gap:8px}.file-label{font-size:12px;background:#fff7d0;padding:8px 11px;border-radius:20px;cursor:pointer;font-weight:700}.file-label input{display:none}.post-btn{background:var(--yellow);padding:9px 19px;border-radius:20px;font-weight:800}.preview{max-width:100%;max-height:190px;border-radius:10px;margin-top:10px;display:block}
+.feed-head{display:flex;align-items:center;justify-content:space-between;margin:8px 2px 12px}.post{padding:15px;margin-bottom:14px}.post-head{display:flex;align-items:center;gap:10px}.post-name{font-weight:800;font-size:13px}.post-time{font-size:11px;color:#888}.post-text{margin:12px 0;white-space:pre-wrap;overflow-wrap:anywhere}.post-image{width:100%;max-height:420px;object-fit:cover;border-radius:12px;border:1px solid #f0ead7}.post-actions{display:flex;gap:22px;border-top:1px solid #f3efdf;margin-top:12px;padding-top:10px}.action{background:none;color:#777;font-size:12px;font-weight:700;padding:3px}.action:hover,.action.liked{color:#d39e00}
+.right-card{padding:15px;height:max-content}.right-card h3{margin:0 0 12px;font-size:14px}.person{display:flex;align-items:center;gap:8px;margin:12px 0}.person .pill{padding:6px 10px;font-size:11px;margin-left:auto}.person-info{min-width:0}.person-info strong{font-size:12px;display:block}.profile-card{text-align:center;padding:22px;margin-bottom:17px}.profile-card .avatar{width:64px;height:64px;margin:0 auto 9px;font-size:22px}.stats{display:flex;justify-content:center;gap:25px;margin-top:15px}.stats strong{display:block}.stats span{font-size:11px;color:#888}.tabs{display:flex;gap:8px;margin:0 0 13px}.tabs button{background:#fff4c5;border-radius:18px;padding:7px 13px;font-size:12px;font-weight:750}.tabs button.active{background:var(--yellow)}
+.empty{text-align:center;color:#888;padding:30px 15px;font-size:13px}.page-title{font-size:20px;margin:0 0 15px}.search{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:22px;margin-bottom:14px;outline:none}
+.modal-backdrop{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:18px;z-index:10}.modal{background:white;border-radius:16px;padding:20px;width:min(440px,100%);box-shadow:0 20px 60px #0003}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.modal-head h3{margin:0}.close{background:#fff3bd;border-radius:50%;width:30px;height:30px;font-size:18px}.field{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;margin:7px 0;outline:none}.wide{width:100%;margin-top:10px}.comment{padding:10px 0;border-bottom:1px solid #f1eddf}.comment strong{font-size:12px}.comment p{margin:4px 0;font-size:13px}.auth-screen{min-height:100vh;background:linear-gradient(120deg,#fff1a8,#ffd400);display:grid;place-items:center;padding:20px}.auth-box{background:white;width:min(390px,100%);padding:30px;border-radius:18px;text-align:center;box-shadow:0 15px 45px #7e690033}.auth-box .brand{justify-content:center;margin-bottom:5px}.auth-box h2{margin:7px 0 2px}.auth-box p{color:#888;font-size:12px;margin:0 0 18px}.auth-box .field{text-align:left}.auth-switch{font-size:12px;margin-top:14px}.text-button{background:none;color:#b28d00;font-weight:800}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#252525;color:white;padding:10px 16px;border-radius:22px;font-size:12px;z-index:20}
+footer{text-align:center;color:#aaa;font-size:11px;padding:20px}
+@media(max-width:850px){.layout{grid-template-columns:180px minmax(0,1fr)}.right-col{display:none}}
+@media(max-width:600px){.topbar{padding:0 13px}.nav{gap:4px}.nav button{padding:8px 10px;font-size:11px}.layout{display:block;margin:15px auto;padding:0 12px}.left-col{display:none}.welcome{padding:16px}.post{padding:12px}.brand{font-size:19px}}
+</style>
+</head>
+<body>
+<div id="authScreen" class="auth-screen">
+ <div class="auth-box">
+  <div class="brand"><span class="brandmark">✦</span> Chirp</div>
+  <h2 id="authTitle">Welcome back!</h2><p id="authSubtitle">Sign in to see what's happening.</p>
+  <form id="authForm">
+   <input class="field hidden" id="fullName" placeholder="Your name" autocomplete="name">
+   <input class="field" id="username" placeholder="Username" required autocomplete="username">
+   <input class="field" id="password" type="password" placeholder="Password" required autocomplete="current-password">
+   <button class="pill wide" id="authSubmit">Login</button>
+  </form>
+  <div class="auth-switch"><span id="switchText">Don't have an account?</span> <button class="text-button" id="switchAuth">Register</button></div>
+  <div class="muted" style="margin-top:14px">Demo app · Your posts stay in this browser</div>
+ </div>
+</div>
+<div id="app" class="app hidden">
+ <header class="topbar">
+  <a class="brand" href="#" data-page="home"><span class="brandmark">✦</span> Chirp</a>
+  <nav class="nav"><button data-page="home">Home</button><button data-page="discover">People</button><button data-page="profile">Profile</button><button class="dark" id="logout">Logout</button></nav>
+ </header>
+ <div class="layout">
+  <aside class="left-col"><div class="side-card">
+   <div class="user-mini"><div class="avatar" id="sideAvatar">U</div><div><strong id="sideName">User</strong><div class="muted" id="sideHandle">@user</div></div></div>
+   <div class="side-link active" data-page="home">⌂ <span>Home Feed</span></div>
+   <div class="side-link" data-page="discover">♧ <span>Discover People</span></div>
+   <div class="side-link" data-page="profile">◉ <span>My Profile</span></div>
+  </div></aside>
+  <main class="content" id="mainContent"></main>
+  <aside class="right-col"><div class="panel right-card"><h3>✦ People to follow</h3><div id="suggestions"></div><div class="muted">Find interesting people and join the conversation.</div></div></aside>
+ </div>
+ <footer>Chirp · Share a little, connect a lot.</footer>
+</div>
+<div id="modalRoot"></div><div id="toastRoot"></div>
+<script>
+const $=s=>document.querySelector(s);
+const storeKey='chirp_social_v1';
+const demoUsers=[{username:'maya',name:'Maya Rose',password:'demo',bio:'Collecting little moments ✨',following:[]},{username:'arun',name:'Arun Kumar',password:'demo',bio:'Coffee, code and conversations.',following:[]},{username:'sana',name:'Sana',password:'demo',bio:'Making memories every day.',following:[]}];
+let db=JSON.parse(localStorage.getItem(storeKey)||'null')||{users:demoUsers,posts:[
+{id:1,user:'maya',text:'Hello everyone! Welcome to Chirp 🌼',image:'',time:Date.now()-3600000,likes:[],comments:[]},
+{id:2,user:'arun',text:'A small reminder: keep learning, keep growing. ✨',image:'',time:Date.now()-7200000,likes:[],comments:[]}
+]};
+let current=null,authMode='login',page='home',pendingImage='';
+function save(){localStorage.setItem(storeKey,JSON.stringify(db))}
+function user(name){return db.users.find(u=>u.username===name)}
+function initials(name){return (name||'U').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase()}
+function avatar(name,small=false){let u=user(name);return `<div class="avatar ${small?'small':''}">${initials(u?.name||name)}</div>`}
+function escapeHTML(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function timeAgo(t){let m=Math.max(1,Math.floor((Date.now()-t)/60000));return m<60?m+'m ago':m<1440?Math.floor(m/60)+'h ago':Math.floor(m/1440)+'d ago'}
+function toast(msg){$('#toastRoot').innerHTML=`<div class="toast">${escapeHTML(msg)}</div>`;setTimeout(()=>$('#toastRoot').innerHTML='',2200)}
+function setAuth(mode){authMode=mode;$('#authTitle').textContent=mode==='login'?'Welcome back!':'Create your account';$('#authSubtitle').textContent=mode==='login'?"Sign in to see what's happening.":'Join the conversation on Chirp.';$('#fullName').classList.toggle('hidden',mode==='login');$('#fullName').required=mode==='register';$('#authSubmit').textContent=mode==='login'?'Login':'Register';$('#switchText').textContent=mode==='login'?"Don't have an account?":'Already have an account?';$('#switchAuth').textContent=mode==='login'?'Register':'Login'}
+$('#switchAuth').onclick=()=>setAuth(authMode==='login'?'register':'login');
+$('#authForm').onsubmit=e=>{e.preventDefault();let name=$('#username').value.trim().toLowerCase(),pass=$('#password').value;if(authMode==='register'){if(db.users.some(u=>u.username===name)){toast('Username already exists');return}let u={username:name,name:$('#fullName').value.trim()||name,password:pass,bio:'',following:[]};db.users.push(u);current=name;save();startApp()}else{let u=user(name);if(!u||u.password!==pass){toast('Incorrect username or password');return}current=name;startApp()}};
+function startApp(){$('#authScreen').classList.add('hidden');$('#app').classList.remove('hidden');let u=user(current);$('#sideAvatar').textContent=initials(u.name);$('#sideName').textContent=u.name;$('#sideHandle').textContent='@'+u.username;render();renderSuggestions()}
+$('#logout').onclick=()=>{current=null;$('#app').classList.add('hidden');$('#authScreen').classList.remove('hidden');$('#authForm').reset()};
+document.addEventListener('click',e=>{let p=e.target.closest('[data-page]');if(p){e.preventDefault();page=p.dataset.page;render();document.querySelectorAll('.side-link').forEach(x=>x.classList.toggle('active',x.dataset.page===page))}});
+function render(){if(page==='home')renderHome();if(page==='discover')renderDiscover();if(page==='profile')renderProfile(current)}
+function renderHome(){let posts=[...db.posts].sort((a,b)=>b.time-a.time);$('#mainContent').innerHTML=`
+ <section class="welcome"><h2>Welcome to Chirp ✨</h2><p>What's happening in your world today?</p></section>
+ <section class="panel composer"><h3>✦ Create Post</h3><textarea id="postText" maxlength="500" placeholder="What's happening?"></textarea><img id="imagePreview" class="preview hidden"><div class="composer-bottom"><div class="composer-tools"><label class="file-label">▧ Add Photo <input id="postImage" type="file" accept="image/*"></label><span class="muted" id="charCount">0/500</span></div><button class="post-btn" id="publish">Post</button></div></section>
+ <div class="feed-head"><h3 class="section-title">♥ Home Feed</h3><span class="muted">${posts.length} posts</span></div>
+ <div id="feed">${posts.length?posts.map(postHTML).join(''):'<div class="panel empty">No posts yet. Be the first to share something!</div>'}</div>`;
+ $('#postText').oninput=e=>$('#charCount').textContent=e.target.value.length+'/500';
+ $('#postImage').onchange=e=>{let f=e.target.files[0];if(!f)return;if(f.size>2*1024*1024){toast('Please choose an image under 2 MB');e.target.value='';return}let r=new FileReader();r.onload=()=>{pendingImage=r.result;$('#imagePreview').src=pendingImage;$('#imagePreview').classList.remove('hidden')};r.readAsDataURL(f)};
+ $('#publish').onclick=()=>{let text=$('#postText').value.trim();if(!text&&!pendingImage){toast('Write something or add a photo');return}db.posts.push({id:Date.now(),user:current,text,image:pendingImage,time:Date.now(),likes:[],comments:[]});pendingImage='';save();renderHome();renderSuggestions();toast('Your post is live!')};
+}
+function postHTML(p){let u=user(p.user)||{name:p.user,username:p.user},liked=p.likes.includes(current);return `<article class="post"><div class="post-head">${avatar(p.user,true)}<div><div class="post-name">${escapeHTML(u.name)} <span class="muted">@${escapeHTML(u.username)}</span></div><div class="post-time">${timeAgo(p.time)}</div></div></div><div class="post-text">${escapeHTML(p.text)}</div>${p.image?`<img class="post-image" src="${p.image}" alt="Post image">`:''}<div class="post-actions"><button class="action ${liked?'liked':''}" data-like="${p.id}">${liked?'♥':'♡'} ${p.likes.length} Like</button><button class="action" data-comments="${p.id}">▢ ${p.comments.length} Comments</button>${p.user===current?`<button class="action" data-delete="${p.id}">Delete</button>`:''}</div></article>`}
+$('#mainContent').addEventListener('click',e=>{let like=e.target.closest('[data-like]'),com=e.target.closest('[data-comments]'),del=e.target.closest('[data-delete]'),follow=e.target.closest('[data-follow]'),profile=e.target.closest('[data-user]');if(like){let p=db.posts.find(x=>x.id==like.dataset.like);p.likes=p.likes.includes(current)?p.likes.filter(x=>x!==current):[...p.likes,current];save();render();}if(com)openComments(+com.dataset.comments);if(del){db.posts=db.posts.filter(x=>x.id!=del.dataset.delete);save();render();toast('Post deleted')}if(follow){toggleFollow(follow.dataset.follow);render();renderSuggestions()}if(profile){page='profile';renderProfile(profile.dataset.user)}});
+function openComments(id){let p=db.posts.find(x=>x.id===id);if(!p)return;$('#modalRoot').innerHTML=`<div class="modal-backdrop" id="backdrop"><div class="modal"><div class="modal-head"><h3>Comments</h3><button class="close" id="closeModal">×</button></div><div id="commentList">${p.comments.map(c=>`<div class="comment"><strong>${escapeHTML(user(c.user)?.name||c.user)}</strong><p>${escapeHTML(c.text)}</p></div>`).join('')||'<div class="empty">No comments yet. Start the conversation!</div>'}</div><div style="display:flex;gap:8px;margin-top:12px"><input class="field" id="commentInput" placeholder="Write a comment..." style="margin:0"><button class="pill" id="sendComment">Send</button></div></div></div>`;
+ $('#closeModal').onclick=()=>$('#modalRoot').innerHTML='';$('#backdrop').onclick=e=>{if(e.target.id==='backdrop')$('#modalRoot').innerHTML=''};$('#sendComment').onclick=()=>{let t=$('#commentInput').value.trim();if(!t)return;p.comments.push({user:current,text:t});save();openComments(id);render()};
+}
+function toggleFollow(name){let u=user(current);if(name===current)return;u.following=u.following||[];u.following=u.following.includes(name)?u.following.filter(x=>x!==name):[...u.following,name];save();toast(u.following.includes(name)?'Following @'+name:'Unfollowed @'+name)}
+function renderSuggestions(){let people=db.users.filter(u=>u.username!==current).slice(0,4);$('#suggestions').innerHTML=people.map(u=>`<div class="person">${avatar(u.username,true)}<div class="person-info"><strong>${escapeHTML(u.name)}</strong><span class="muted">@${escapeHTML(u.username)}</span></div><button class="pill" data-follow="${u.username}">${user(current).following?.includes(u.username)?'Following':'Follow'}</button></div>`).join('')||'<div class="muted">No suggestions yet.</div>'}
+function renderDiscover(){let people=db.users.filter(u=>u.username!==current);$('#mainContent').innerHTML=`<h2 class="page-title">♧ Discover People</h2><input class="search" id="peopleSearch" placeholder="Search people..."><div id="peopleList">${peopleHTML(people)}</div>`;$('#peopleSearch').oninput=e=>$('#peopleList').innerHTML=peopleHTML(people.filter(u=>(u.name+' '+u.username).toLowerCase().includes(e.target.value.toLowerCase())))}
+function peopleHTML(arr){return arr.map(u=>`<div class="panel" style="padding:13px;margin-bottom:10px;display:flex;align-items:center;gap:12px">${avatar(u.username)}<div style="flex:1"><strong>${escapeHTML(u.name)}</strong><div class="muted">@${escapeHTML(u.username)}</div><div class="muted">${escapeHTML(u.bio||'New to Chirp')}</div></div><button class="pill" data-follow="${u.username}">${user(current).following?.includes(u.username)?'Following':'Follow'}</button></div>`).join('')||'<div class="panel empty">No people found.</div>'}
+function renderProfile(name){let u=user(name);if(!u)return;let posts=db.posts.filter(p=>p.user===name).sort((a,b)=>b.time-a.time),followers=db.users.filter(x=>x.following?.includes(name)).length;$('#mainContent').innerHTML=`<div class="profile-card">${avatar(name)}<h2 style="margin:0;font-size:18px">${escapeHTML(u.name)}</h2><div class="muted">@${escapeHTML(u.username)}</div><p style="font-size:13px">${escapeHTML(u.bio||'No bio added yet.')}</p>${name!==current?`<button class="pill" data-follow="${name}">${user(current).following?.includes(name)?'Following':'Follow'}</button>`:`<button class="pill" id="editProfile">Edit Profile</button>`}<div class="stats"><div><strong>${posts.length}</strong><span>Posts</span></div><div><strong>${followers}</strong><span>Followers</span></div><div><strong>${u.following?.length||0}</strong><span>Following</span></div></div></div><div class="feed-head"><h3 class="section-title">▧ ${name===current?'My Posts':"Posts"}</h3></div>${posts.map(postHTML).join('')||'<div class="panel empty">No posts yet.</div>'}`;
+ $('#editProfile')?.addEventListener('click',()=>{let bio=prompt('Write a short bio:',u.bio||'');if(bio!==null){u.bio=bio.slice(0,120);save();renderProfile(name)}});
+}
+setAuth('login');
+</script>
+</body>
+</html>
